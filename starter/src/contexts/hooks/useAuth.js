@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import api from '../../api';
 import history from '../../history';
 
-export default function useAuth() {
+const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -17,22 +17,34 @@ export default function useAuth() {
 
     setLoading(false);
   }, []);
-  
-  async function handleLogin() {
-    const { data: { token } } = await api.post('/authenticate');
+
+  const handleLogin = async () => {
+    const {
+      data: { token },
+    } = await api.post('/authenticate');
 
     localStorage.setItem('token', JSON.stringify(token));
-    api.defaults.headers.Authorization = `Bearer ${token}`;
-    setAuthenticated(true);
-    history.push('/users');
-  }
 
-  function handleLogout() {
-    setAuthenticated(false);
+    api.defaults.headers.Authorization = `Bearer ${token}`;
+
+    setAuthenticated(true);
+
+    history.push('/users');
+  };
+
+  const handleLogout = () => {
     localStorage.removeItem('token');
     api.defaults.headers.Authorization = undefined;
+    setAuthenticated(false);
     history.push('/login');
-  }
-  
-  return { authenticated, loading, handleLogin, handleLogout };
-}
+  };
+
+  return {
+    authenticated,
+    loading,
+    handleLogin,
+    handleLogout,
+  };
+};
+
+export default useAuth;
